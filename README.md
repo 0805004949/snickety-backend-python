@@ -8,6 +8,8 @@ pwd= "blahblabhblavh/snickety-backend-python"
 - run 
 ```
 $ make br
+$ [in-docker-container] FLASK_APP=app.py
+$ [in-docker-container] FLASK_DEBUG=1
 $ [in-docker-container] cd ./api
 $ [in-docker-container] python -m flask run -h 0.0.0.0 -p 5000
 ```
