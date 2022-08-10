@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "b0ac27e3-7e77-404c-a117-ba8731b03851",
+		"name": "snickety-backend-python",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16371621"
+	},
+	"item": [
+		{
+			"name": "health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/ping",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "join-dog",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"dog@gmail.com\", \"password\":\"486\", \"name\":\"dog\", \"profile\":\"i love dog\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/sign-up",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "join-cat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"cat@gmail.com\", \"password\":\"486\", \"name\":\"cat\", \"profile\":\"i love cat\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/sign-up",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "write tweets - dog",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"1\", \"tweet\":\"first user wrote tweet\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/tweet",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tweet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "write tweets - cat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"2\", \"tweet\":\"2222second user wrote tweet\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/tweet",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tweet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dog follows cat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"1\", \"follow\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/follow",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"follow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dog unfollows cat Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"1\", \"unfollow\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/unfollow",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"unfollow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dog user feed",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/timeline/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"timeline",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
