@@ -1,10 +1,27 @@
 from flask import Flask, jsonify, request
+from sqlalchemy import create_engine, text
 
-app = Flask(__name__)
-app.id_count = 0
-app.users = {}
-app.tweets = {}
+def create_app(test_config=None): 
+    """
+    flask가 create_app이라는 이름 함수
+    자동으로 팩토리 함수로 인식해 해당함수로 flask 실행
+    config인자 받는데 유닛테스트에서 사용하기 편함
+    """
+    app = Flask(__name__)
+    
+    if test_config:
+        app.config.update(test_config)
+    else:
+        app.config.from_pyfile("config.py")
+    database = create_engine(app.config['DB_URL'], encoding='utf-8', max_overflow=0)
+    app.database = database
+    return app
+    
+# app.id_count = 0
+# app.users = {}
+# app.tweets = {}
 
+app = create_app()
 @app.route("/ping", methods=['GET'])
 def ping():
     """_summary_
@@ -36,11 +53,23 @@ def sign_up():
     # 함수내에서 request.json을 사용하는 순간 서버는 json 데이터를 받는것을 기대함
     # request.json을 사용하는데 요청에 파라미터가 없다면 400 에러가 뜸
     print(request.json)
-    app.id_count+=1
-    user_id = app.id_count
-    user = request.json
-    app.users[user_id] = user
-    return jsonify(app.users)
+    new_user = request.json
+    new_user_id = app.database.execute(text("""
+                                            insert into users (name, email, profile,hashed_password)
+                                            values (:name, :email, :profile, :password)
+                                            """), new_user).lastrowid
+    row = app.database.execute(text("""
+                                    select id, name, email, profile from users
+                                    where id = :user_id
+                                    """), {'user_id':new_user_id}).fetchone()
+    created_user = {
+        'id' : row['id'],
+        'name' : row['name'],
+        'email' : row['email'],
+        'profile' : row['profile']
+    } if row else None
+    
+    return jsonify(created_user)
 
 @app.route("/tweet", methods=['POST'])
 def write_tweet():
