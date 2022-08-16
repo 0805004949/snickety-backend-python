@@ -31,7 +31,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"email\":\"dog@gmail.com\", \"password\":\"486\", \"name\":\"dog\", \"profile\":\"i love dog\"}",
+					"raw": "{\"email\":\"dog@gmail.com\", \"password\":\"486\", \"name\":\"dog\", \"profile\":\"i love dog\", \"hashed_password\":\"123456\"}",
 					"options": {
 						"raw": {
 							"language": "json"
