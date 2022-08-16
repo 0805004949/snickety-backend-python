@@ -81,17 +81,21 @@ def write_tweet():
         len(txt)<300 return request.data
     curl -d '{"id":"1", "tweet":"wtf"}' -H "Content-Type: application/json" -X POST localhost:5000/tweet
     """
-    payload = request.json
-    user_id = int(payload['id'])
-    tweet = payload["tweet"]
-    if user_id not in app.users:
-        return "사용자가 존재하지 않습니다", 400
+    print(request.json)
+    tweet = request.json
+    tweet_contents = tweet["tweet"]
     
-    if len(tweet)>300:
-        return "300자를 초과했습니다", 400
-    app.tweets.setdefault(user_id, []).append(tweet)
+    if len(tweet_contents) > 300:
+        return "300자를 초과했습니다", 400    
+    
+    # id검산느안하나?
+    app.database.execute(text("""
+                              insert into tweets (user_id, tweet)
+                              values(:id, :tweet)
+                              """), tweet)
+    
 
-    return app.tweets
+    return '', 200
 
 
 """
@@ -111,15 +115,12 @@ def follow():
     payload = request.json
     user_id = int(payload["id"])
     follow_id = int(payload["follow"])
+    app.database.execute(text("""
+                              insert into users_follow_list (user_id, follow_user_id)
+                            values (:id, :follow);
+                              """), payload)
     
-    if (user_id not in app.users) or (follow_id not in app.users):
-        return "사용자가 존재하지 않습니다", 400
-    
-    user = app.users[user_id]
-    user.setdefault("follow", set()).add(follow_id)
-    
-    print(app.users)
-    return "팔로우완료"
+    return "팔로우완료", 200
 
 
 @app.route("/unfollow", methods=['POST'])
@@ -137,14 +138,10 @@ def unfollow():
     payload = request.json
     user_id = int(payload["id"])
     unfollow_id = int(payload["unfollow"])
-    
-    if (user_id not in app.users) or (unfollow_id not in app.users):
-        return "사용자가 존재하지 않습니다", 400
-    
-    user = app.users[user_id]
-    
-    user.setdefault("follow", set()).discard(unfollow_id)
-    print(app.users)
+    app.database.execute(text("""
+                              delete from users_follow_list
+                              where user_id=:id and follow_user_id=:unfollow
+                              """),{'id':user_id, 'unfollow':unfollow_id})
     return "언팔로우완료"
 
 
@@ -180,14 +177,18 @@ def timeline(user_id):
     :type user_id: _type_
     :return: _description_
     :rtype: _type_
+    print(user_id)
     """
-    if user_id not in app.users:
-        return "사용자가 존재하지 않습니다", 400   
-    
-    following = app.users[user_id].get("follow")
-    tweets = []
-    tweets.append({user_id:app.tweets[user_id]})
-    tweets.extend([ {_id:app.tweets[_id]} for _id in following if app.tweets.get(_id) ])
-    print(tweets,'<<<<<<<<<<<<<<<')
-    
-    return "fuxk"
+    r = app.database.execute(text("""
+    select t.user_id, t.tweet, t.created_at
+    from tweets t
+    left join users_follow_list as u
+    on u.user_id= :user_id
+    where t.user_id=:user_id or t.user_id=u.follow_user_id;
+                                
+                              """),{'user_id':user_id}).fetchall()
+    timeline = [{
+        'user_id' : row['user_id'],
+        'tweet' : row['tweet']
+    } for row in r]
+    return jsonify({'user_id':user_id, 'timeline':timeline})
