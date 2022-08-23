@@ -5,15 +5,15 @@ my journey to follow up python book related to backend.
 # HOW-TO-START
 - edit makefile $(pwd) to the abspath where `snickety-backend-python` is  
 ```
-pwd= "blahblabhblavh/snickety-backend-python"
+pwd= "blahblabhblavh/snickety-backend-python/frontend"
+pwd= "blahblabhblavh/snickety-backend-python/backend"
 ```
-- run 
+- to run 
 ```
-$ make br
-$ [in-docker-container] FLASK_APP=app.py
-$ [in-docker-container] FLASK_DEBUG=1
-$ [in-docker-container] cd ./api
-$ [in-docker-container] python -m flask run -h 0.0.0.0 -p 5000
+$ docker-compose up
+$ curl -X GET http://0.0.0.0:8000
 ```
 - why -h option for running flask?
 [flask-docs](https://flask.palletsprojects.com/en/1.1.x/quickstart/#what-to-do-if-the-server-does-not-start)
+- original frontend code example from?
+[frontend-code](https://github.com/Yeri-Kim/python-tutorial-frontend)
