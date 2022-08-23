@@ -1,8 +1,54 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response, g
 from sqlalchemy import create_engine, text
 import bcrypt
 import datetime
 import jwt
+from functools import wraps
+
+
+def get_user_info(user_id):
+    row = app.database.execute(
+        text(
+            """
+                                    select id, name, email, profile from users
+                                    where id = :user_id
+                                    """
+        ),
+        {"user_id": user_id},
+    ).fetchone()
+    if not row:
+        return None
+    user = {"id": user_id, "email": row["email"], "profile": row["profile"]}
+
+    return user
+
+
+def login_required(f):
+    # 인증절차 이걸 가지고선 토큰이 맞는지 확인
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        access_token = request.headers.get("Authorization")
+        print(access_token, "<<<<<")
+        if access_token is not None:
+
+            try:
+                payload = jwt.decode(access_token, app.config["JWT_SECRET_KEY"], "HS256")
+
+            except jwt.InvalidTokenError:
+                payload = None
+
+            if payload is None:
+                return Response(status=401)
+
+            user_id = payload["user_id"]
+            g.user_id = user_id
+            g.user = get_user_info(user_id) if user_id else None
+        else:  # payload가 비어있지 않다면
+            return Response(status=401)
+
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 def create_app(test_config=None):
@@ -102,6 +148,7 @@ def sign_up():
 
 
 @app.route("/tweet", methods=["POST"])
+@login_required
 def write_tweet():
     """_summary_
     id, twt 입력
@@ -137,6 +184,7 @@ def write_tweet():
 
 
 @app.route("/follow", methods=["POST"])
+@login_required
 def follow():
     """
     팔로잉 구현
@@ -165,6 +213,7 @@ def follow():
 
 
 @app.route("/unfollow", methods=["POST"])
+@login_required
 def unfollow():
     """
     언팔로잉 구현
