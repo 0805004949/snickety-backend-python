@@ -29,7 +29,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         access_token = request.headers.get("Authorization")
-        print(access_token, "<<<<<")
+
         if access_token is not None:
 
             try:
@@ -99,6 +99,7 @@ def login():
     if row and bcrypt.checkpw(pw.encode("utf-8"), row["hashed_password"].encode("utf-8")):  # db에 있는것돠 내가 만든것이 같다면
         payloads = {"user_id": row["id"], "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)}
         token = jwt.encode(payloads, app.config["JWT_SECRET_KEY"], "HS256")  # 유효기간 하루
+        print(payloads, "<!!!!<")
         return jsonify({"access_token": token})
     else:
         return "fuck you go away", 401
@@ -106,7 +107,7 @@ def login():
 
 @app.route("/sign-up", methods=["POST"])
 def sign_up():
-    """_summary_
+    """_summary_s
     회원가입
     app.users = {}
     app.id_count = 1
@@ -159,9 +160,9 @@ def write_tweet():
         len(txt)<300 return request.data
     curl -d '{"id":"1", "tweet":"wtf"}' -H "Content-Type: application/json" -X POST localhost:5000/tweet
     """
-    print(request.json)
     tweet = request.json
     tweet_contents = tweet["tweet"]
+    tweet["id"] = g.user_id
 
     if len(tweet_contents) > 300:
         return "300자를 초과했습니다", 400
@@ -180,10 +181,6 @@ def write_tweet():
     return "", 200
 
 
-"""
-"""
-
-
 @app.route("/follow", methods=["POST"])
 @login_required
 def follow():
@@ -198,8 +195,8 @@ def follow():
     curl -d '{"id":"1", "follow":2}' -H "Content-Type: application/json" -X POST http://localhost:5000/follow
     """
     payload = request.json
-    user_id = int(payload["id"])
-    follow_id = int(payload["follow"])
+    payload["id"] = g.user_id
+
     app.database.execute(
         text(
             """
@@ -227,8 +224,8 @@ def unfollow():
     curl -d '{"id":"1", "unfollow":"2"}' -H "Content-Type: application/json" -X POST http://localhost:5000/unfollow
     """
     payload = request.json
-    user_id = int(payload["id"])
-    unfollow_id = int(payload["unfollow"])
+    payload["id"] = g.user_id
+
     app.database.execute(
         text(
             """
@@ -236,44 +233,68 @@ def unfollow():
                               where user_id=:id and follow_user_id=:unfollow
                               """
         ),
-        {"id": user_id, "unfollow": unfollow_id},
+        payload,
     )
-    return "언팔로우완료"
+    return "언팔로우완료", 200
 
 
-@app.route("/timeline/<int:user_id>", methods=["GET"])
-def timeline(user_id):
-    """
-    트위터 타임라인
-    내가 작성했던 트위터와
-    내가 팔로우한느 사람들의 트위터 모드 출력
-    요청 : 사용자 아이디
-    user_tweets = app.tweets[user_id]
-    팔로워리스트 가져오고
-    following = app.users[user_id][follow]
-    그 팔로워들의 트위터들 찾아
-    timeline = []
-    for following in followiing_list:
-        tweets = app.tweets[following]
-        timeline.extend(tweets)
-    리스트형태로 갖다 넣음?
-    출력 : [{},{},{}]
-    """
+# @app.route("/timeline/<int:user_id>", methods=["GET"])
+# def timeline(user_id):
+#     print("fuck")
+#     """
+#     트위터 타임라인
+#     내가 작성했던 트위터와
+#     내가 팔로우한느 사람들의 트위터 모드 출력
+#     요청 : 사용자 아이디
+#     user_tweets = app.tweets[user_id]
+#     팔로워리스트 가져오고
+#     following = app.users[user_id][follow]
+#     그 팔로워들의 트위터들 찾아
+#     timeline = []
+#     for following in followiing_list:
+#         tweets = app.tweets[following]
+#         timeline.extend(tweets)
+#     리스트형태로 갖다 넣음?
+#     출력 : [{},{},{}]
+#     """
 
-    """_summary_
-    curl -d '{"email":"x0805004949@gmail.com", "password":"486", "name":"x0805004949", "profile":"i love this book"}' -H "Content-Type: application/json" -X POST http://localhost:5000/sign-up 
-    curl -d '{"email":"kimchi@gmail.com", "password":"486", "name":"kimchi", "profile":"i hate this book"}' -H "Content-Type: application/json" -X POST http://localhost:5000/sign-up 
-    curl -d '{"id":"1", "follow":"2"}' -H "Content-Type: application/json" -X POST http://localhost:5000/follow
+#     """_summary_
+#     curl -d '{"email":"x0805004949@gmail.com", "password":"486", "name":"x0805004949", "profile":"i love this book"}' -H "Content-Type: application/json" -X POST http://localhost:5000/sign-up
+#     curl -d '{"email":"kimchi@gmail.com", "password":"486", "name":"kimchi", "profile":"i hate this book"}' -H "Content-Type: application/json" -X POST http://localhost:5000/sign-up
+#     curl -d '{"id":"1", "follow":"2"}' -H "Content-Type: application/json" -X POST http://localhost:5000/follow
 
-    curl -d '{"id":"1", "tweet":"wtf"}' -H "Content-Type: application/json" -X POST localhost:5000/tweet
-    curl  -X GET localhost:5000/timeline/1
+#     curl -d '{"id":"1", "tweet":"wtf"}' -H "Content-Type: application/json" -X POST localhost:5000/tweet
+#     curl  -X GET localhost:5000/timeline/1
 
-    :param user_id: _description_
-    :type user_id: _type_
-    :return: _description_
-    :rtype: _type_
-    print(user_id)
-    """
+#     :param user_id: _description_
+#     :type user_id: _type_
+#     :return: _description_
+#     :rtype: _type_
+#     print(user_id)
+#     """
+#     r = app.database.execute(
+#         text(
+#             """
+#     select t.user_id, t.tweet, t.created_at
+#     from tweets t
+#     left join users_follow_list as u
+#     on u.user_id= :user_id
+#     where t.user_id=:user_id or t.user_id=u.follow_user_id;
+
+#                               """
+#         ),
+#         {"user_id": user_id},
+#     ).fetchall()
+#     timeline = [{"user_id": row["user_id"], "tweet": row["tweet"]} for row in r]
+#     return jsonify({"user_id": user_id, "timeline": timeline})
+
+
+@app.route("/timeline", methods=["GET"])
+@login_required
+def user_timeline():
+    # /timeline?user_id=17
+
+    user_id = request.args["user_id"]
     r = app.database.execute(
         text(
             """
@@ -282,10 +303,11 @@ def timeline(user_id):
     left join users_follow_list as u
     on u.user_id= :user_id
     where t.user_id=:user_id or t.user_id=u.follow_user_id;
-                                
+
                               """
         ),
         {"user_id": user_id},
     ).fetchall()
     timeline = [{"user_id": row["user_id"], "tweet": row["tweet"]} for row in r]
+
     return jsonify({"user_id": user_id, "timeline": timeline})

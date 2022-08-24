@@ -1,16 +1,27 @@
+
 function getCookie(name) {
   return document.cookie.split(';').filter(function(item) {
     return item.indexOf(name) !== -1;
   })[0];
 };
 
+function parseJwt (token) { // user_id 가져오는 함수
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(jsonPayload);
+};
+
+
 $(document).ready(function() {
   var accessToken = (getCookie('token') || '').split('=')[1];
-  var paramArr = (window.location.search.split('?')[1] || '').split('&');
+  var current_user_id = parseJwt(accessToken).user_id; // 현재 로그인된 user_id
+  var paramArr = (window.location.search.split('?')[1] || '').split('&'); // 현재 보고있는 페이지 user_id
   var userId = '';
-
   paramArr.forEach(function (param) {
-    if (param.indexOf('userid') !== -1) {
+    if (param.indexOf('user_id') !== -1) {
       userId = param.split('=')[1];
     }
   })
@@ -22,13 +33,19 @@ $(document).ready(function() {
   }
 
   if (accessToken) {
+    
     $.ajax({
       method: 'GET',
       url: 'http://localhost:5000/timeline',
       headers: {
         'Authorization': accessToken
+      }, 
+      data : {
+        'user_id' : userId
       }
-    })
+    },
+  
+    )
     .done(function(msg) {
       var timeline = msg.timeline;
 
@@ -73,41 +90,50 @@ $(document).ready(function() {
       contentType: 'application/json'
     })
     .done(function(msg) {
-      console.log(msg)
     });
   });
 
   $('#follow').on('click', function () {
-    $.ajax({
-      method: 'POST',
-      url: 'http://localhost:5000/follow',
-      headers: {
-        'Authorization': accessToken
-      },
-      data: JSON.stringify({
-        "follow" : userId
-      }),
-      contentType: 'application/json'
-    })
-      .done(function(msg) {
-        console.log(msg)
-      });
+    if (current_user_id == userId) {
+      alert("나 자신을 팔로우,언팔로우 할 수 없어요!")
+    }else {
+      $.ajax({
+        method: 'POST',
+        url: 'http://localhost:5000/follow',
+        headers: {
+          'Authorization': accessToken
+        },
+        data: JSON.stringify({
+          "follow" : userId
+        }),
+        contentType: 'application/json'
+      })
+        .done(function(msg) {
+        });
+    }
+
+
   });
 
   $('#unfollow').on('click', function () {
-    $.ajax({
-      method: 'POST',
-      url: 'http://localhost:5000/unfollow',
-      headers: {
-        'Authorization': accessToken
-      },
-      data: JSON.stringify({
-        "unfollow" : userId
-      }),
-      contentType: 'application/json'
-    })
-      .done(function(msg) {
-        console.log(msg)
-      });
+    if (current_user_id == userId) {
+      alert("나 자신을 팔로우,언팔로우 할 수 없어요!")
+    }else{
+      $.ajax({
+        method: 'POST',
+        url: 'http://localhost:5000/unfollow',
+        headers: {
+          'Authorization': accessToken
+        },
+        data: JSON.stringify({
+          "unfollow" : userId
+        }),
+        contentType: 'application/json'
+      })
+        .done(function(msg) {
+        });
+
+    }
+
   });
 });
