@@ -31,7 +31,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"email\":\"dog@gmail.com\", \"password\":\"486\", \"name\":\"dog\", \"profile\":\"i love dog\", \"hashed_password\":\"123456\"}",
+					"raw": "{\"email\":\"dog@gmail.com\", \"password\":\"dog486\", \"name\":\"dog\", \"profile\":\"i love dog\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -46,6 +46,33 @@
 					"port": "5000",
 					"path": [
 						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login-dog",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"dog@gmail.com\", \"password\":\"dog486\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"login"
 					]
 				}
 			},
@@ -79,13 +106,46 @@
 			"response": []
 		},
 		{
-			"name": "write tweets - dog",
+			"name": "join-ghost",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":\"1\", \"tweet\":\"first user wrote tweet\"}",
+					"raw": "{\"email\":\"ghost@gmail.com\", \"password\":\"ghost486\", \"name\":\"ghost1234\", \"profile\":\"i love ghost\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/sign-up",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "write tweets - dog",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExLCJleHAiOjE2NjEzNTYwOTd9.SHFRE8rxlcpXm4JYWv76N3tC6EWsPWPaHvI0nX-8PSg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"11\", \"tweet\":\"44444 wrote tweet\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -112,7 +172,34 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":\"2\", \"tweet\":\"2222second user wrote tweet\"}",
+					"raw": "{\"id\":\"12\", \"tweet\":\"i am cat 12345\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/tweet",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"tweet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "write tweets - ghost",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"13\", \"tweet\":\"i am ghost 1111111\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -139,7 +226,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":\"1\", \"follow\":2}",
+					"raw": "{\"id\":\"11\", \"follow\":13}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -192,14 +279,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/timeline/1",
+					"raw": "localhost:5000/timeline/11",
 					"host": [
 						"localhost"
 					],
 					"port": "5000",
 					"path": [
 						"timeline",
-						"1"
+						"11"
 					]
 				}
 			},
