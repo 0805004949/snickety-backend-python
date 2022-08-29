@@ -1,10 +1,13 @@
-FROM python:alpine3.15
+FROM python:3.9-slim
 
 ENV PYTHONUNBUFFERED=1
 LABEL maintainer 0805004949
 
-RUN addgroup app && adduser -SG app app
-USER app
+# 220829, 0805004949, when using alpine setup the user
+# FROM python:alpine3.15
+# RUN addgroup app && adduser -SG app app
+# USER app
+
 WORKDIR /backend
 
 # # shell prompt highlighting
