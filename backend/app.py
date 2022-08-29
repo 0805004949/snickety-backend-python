@@ -210,7 +210,7 @@ def follow():
         payload,
     )
 
-    return jsonify({"id": g.uer_id, "follow": payload["follow"]}), 200
+    return jsonify({"follow": payload["follow"]}), 200
 
 
 @bp.route("/unfollow", methods=["POST"])
@@ -238,7 +238,7 @@ def unfollow():
         ),
         payload,
     )
-    return "언팔로우완료", 200
+    return jsonify({"unfollow": payload["unfollow"]}), 200
 
 
 # @bp.route("/timeline/<int:user_id>", methods=["GET"])
