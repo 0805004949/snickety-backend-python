@@ -1,10 +1,12 @@
-from flask import Flask, jsonify, request, Response, g
+from flask import Flask, jsonify, request, Response, g, Blueprint
 from sqlalchemy import create_engine, text
 import bcrypt
 import datetime
 import jwt
 from flask_cors import CORS
 from functools import wraps
+
+bp = Blueprint("app", __name__)
 
 
 def get_user_info(user_id):
@@ -67,6 +69,7 @@ def create_app(test_config=None):
     database = create_engine(app.config["DB_URL"], encoding="utf-8", max_overflow=0)
     app.database = database
     app.config["JWT_SECRET_KEY"] = "김치국마시지마세요!"
+    app.register_blueprint(bp)
     return app
 
 
@@ -74,10 +77,10 @@ def create_app(test_config=None):
 # app.users = {}
 # app.tweets = {}
 
-app = create_app()
+# app = create_app()
 
 
-@app.route("/ping", methods=["GET"])
+@bp.route("/ping", methods=["GET"])
 def ping():
     """_summary_
     endpoint for healthcheck
@@ -90,7 +93,7 @@ def ping():
     return "pong"
 
 
-@app.route("/login", methods=["POST"])
+@bp.route("/login", methods=["POST"])
 def login():
     user = request.json
     pw = user["password"]
@@ -105,7 +108,7 @@ def login():
         return "fuck you go away", 401
 
 
-@app.route("/sign-up", methods=["POST"])
+@bp.route("/sign-up", methods=["POST"])
 def sign_up():
     """_summary_s
     회원가입
@@ -149,7 +152,7 @@ def sign_up():
     return jsonify(created_user)
 
 
-@app.route("/tweet", methods=["POST"])
+@bp.route("/tweet", methods=["POST"])
 @login_required
 def write_tweet():
     """_summary_
@@ -181,7 +184,7 @@ def write_tweet():
     return "", 200
 
 
-@app.route("/follow", methods=["POST"])
+@bp.route("/follow", methods=["POST"])
 @login_required
 def follow():
     """
@@ -210,7 +213,7 @@ def follow():
     return "팔로우완료", 200
 
 
-@app.route("/unfollow", methods=["POST"])
+@bp.route("/unfollow", methods=["POST"])
 @login_required
 def unfollow():
     """
@@ -238,7 +241,7 @@ def unfollow():
     return "언팔로우완료", 200
 
 
-# @app.route("/timeline/<int:user_id>", methods=["GET"])
+# @bp.route("/timeline/<int:user_id>", methods=["GET"])
 # def timeline(user_id):
 #     print("fuck")
 #     """
@@ -289,7 +292,7 @@ def unfollow():
 #     return jsonify({"user_id": user_id, "timeline": timeline})
 
 
-@app.route("/timeline", methods=["GET"])
+@bp.route("/timeline", methods=["GET"])
 @login_required
 def user_timeline():
     # /timeline?user_id=17
