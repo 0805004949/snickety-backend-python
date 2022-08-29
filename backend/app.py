@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response, g, Blueprint
+from flask import Flask, jsonify, request, Response, g, Blueprint, current_app
 from sqlalchemy import create_engine, text
 import bcrypt
 import datetime
@@ -10,7 +10,7 @@ bp = Blueprint("app", __name__)
 
 
 def get_user_info(user_id):
-    row = app.database.execute(
+    row = current_app.database.execute(
         text(
             """
                                     select id, name, email, profile from users
@@ -35,7 +35,7 @@ def login_required(f):
         if access_token is not None:
 
             try:
-                payload = jwt.decode(access_token, app.config["JWT_SECRET_KEY"], "HS256")
+                payload = jwt.decode(access_token, current_app.config["JWT_SECRET_KEY"], "HS256")
 
             except jwt.InvalidTokenError:
                 payload = None
@@ -98,10 +98,10 @@ def login():
     user = request.json
     pw = user["password"]
 
-    row = app.database.execute(text("select id, hashed_password from users where email = :email"), {"email": user["email"]}).fetchone()
+    row = current_app.database.execute(text("select id, hashed_password from users where email = :email"), {"email": user["email"]}).fetchone()
     if row and bcrypt.checkpw(pw.encode("utf-8"), row["hashed_password"].encode("utf-8")):  # db에 있는것돠 내가 만든것이 같다면
         payloads = {"user_id": row["id"], "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)}
-        token = jwt.encode(payloads, app.config["JWT_SECRET_KEY"], "HS256")  # 유효기간 하루
+        token = jwt.encode(payloads, current_app.config["JWT_SECRET_KEY"], "HS256")  # 유효기간 하루
         print(payloads, "<!!!!<")
         return jsonify({"access_token": token})
     else:
@@ -129,7 +129,7 @@ def sign_up():
     print(request.json)
     new_user = request.json
     new_user["password"] = bcrypt.hashpw(new_user["password"].encode("utf-8"), bcrypt.gensalt())
-    new_user_id = app.database.execute(
+    new_user_id = current_app.database.execute(
         text(
             """
                                             insert into users (name, email, profile,hashed_password)
@@ -138,7 +138,7 @@ def sign_up():
         ),
         new_user,
     ).lastrowid
-    row = app.database.execute(
+    row = current_app.database.execute(
         text(
             """
                                     select id, name, email, profile from users
@@ -171,7 +171,7 @@ def write_tweet():
         return "300자를 초과했습니다", 400
 
     # id검산느안하나?
-    app.database.execute(
+    current_app.database.execute(
         text(
             """
                               insert into tweets (user_id, tweet)
@@ -200,7 +200,7 @@ def follow():
     payload = request.json
     payload["id"] = g.user_id
 
-    app.database.execute(
+    current_app.database.execute(
         text(
             """
                               insert into users_follow_list (user_id, follow_user_id)
@@ -210,7 +210,7 @@ def follow():
         payload,
     )
 
-    return "팔로우완료", 200
+    return jsonify({"id": g.uer_id, "follow": payload["follow"]}), 200
 
 
 @bp.route("/unfollow", methods=["POST"])
@@ -229,7 +229,7 @@ def unfollow():
     payload = request.json
     payload["id"] = g.user_id
 
-    app.database.execute(
+    current_app.database.execute(
         text(
             """
                               delete from users_follow_list
@@ -275,7 +275,7 @@ def unfollow():
 #     :rtype: _type_
 #     print(user_id)
 #     """
-#     r = app.database.execute(
+#     r = current_app.database.execute(
 #         text(
 #             """
 #     select t.user_id, t.tweet, t.created_at
@@ -297,8 +297,10 @@ def unfollow():
 def user_timeline():
     # /timeline?user_id=17
 
-    user_id = request.args["user_id"]
-    r = app.database.execute(
+    user_id = g.user_id
+    if request.args:
+        user_id = request.args["user_id"]
+    r = current_app.database.execute(
         text(
             """
     select t.user_id, t.tweet, t.created_at
