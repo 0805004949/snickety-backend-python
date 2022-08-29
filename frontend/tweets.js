@@ -41,7 +41,7 @@ $(document).ready(function() {
         'Authorization': accessToken
       }, 
       data : {
-        'user_id' : userId
+        'user_id' : userId // 주소에 있는 user_id  타임라인 가져옴
       }
     },
   

@@ -4,3 +4,4 @@ pymysql
 pyjwt
 bcrypt
 flask-cors
+pytest
