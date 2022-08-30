@@ -6,12 +6,8 @@ def return_db_config() -> dict:
     secret_name = "dev/app/mysql"
     region_name = "ap-northeast-2"
 
-    # Create a Secrets Manager client
-    session = boto3.session.Session(profile_name='personal', region_name='ap-northeast-2')
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
+    client = boto3.client("secretsmanager", region_name=region_name)
+
 
     # In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
     # See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
