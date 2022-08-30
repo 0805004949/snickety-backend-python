@@ -1,4 +1,4 @@
-pwd = "/Users/0805004949/ws/snickety-backend-python/backend"
+pwd = "/home/ec2-user/snickety-backend-python/backend"
 br:
 	docker build -t flask-backend .
 	docker run -it --rm -p 5000:5000 --name flask-app -v $(pwd):/backend -v ~/.aws:/root/.aws flask-backend python -m flask run -h 0.0.0.0
@@ -10,3 +10,8 @@ run:
 
 shell:
 	docker exec -it flask-app  /bin/bash
+pbr:
+	docker build -t flask-backend .
+	docker run -it --rm -p 5000:5000 --name flask-app  flask-backend python -m flask run -h 0.0.0.0
+prun:
+	docker run -it --rm -p 5000:5000 --name flask-app  flask-backend python -m flask run -h 0.0.0.0
