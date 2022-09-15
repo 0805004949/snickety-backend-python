@@ -24,15 +24,6 @@ class Local(Global):
     env_state = "local"
 
 
-def setup_env(stage: str = "dev"):
-    stage_dict = {"prod": Prod, "dev": Dev}
-
-    if platform.system() == "Darwin":  # dev & local
-        stage = "local"
-    current_envs = stage_dict.get(stage)
-    return current_envs
-
-
 class FactorySettings:
     @staticmethod
     def load():
