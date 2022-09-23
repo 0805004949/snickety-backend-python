@@ -1,14 +1,12 @@
 import boto3
 from botocore.exceptions import ClientError
 import json
-
+import sys
 def return_db_config() -> dict:
     secret_name = "dev/app/mysql"
-    region_name = "ap-northeast-2"
+    session = boto3.session.Session(profile_name='dev',  region_name="ap-northeast-2")
 
-    client = boto3.client("secretsmanager", region_name=region_name)
-
-
+    client = session.client('secretsmanager', region_name= "ap-northeast-2")
     # In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
     # See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
     # We rethrow the exception by default.
@@ -48,12 +46,15 @@ def return_db_config() -> dict:
         return secret
     
 
+
     
 
 db = return_db_config()
 test_db = return_db_config()
 
 DB_URL = f"mysql+pymysql://{db['user']}:{db['password']}@{db['host']}:{db['port']}/{db['database']}?charset=utf8"
+JWT_SECRET_KEY = "김치국마시지마세요"
+JWT_EXP_DELTA_SECONDS = 7 * 24 * 60 * 60
 test_config = {"DB_URL": f"mysql+pymysql://{test_db['user']}:{test_db['password']}@{test_db['host']}:{test_db['port']}/{test_db['database']}?charset=utf8"}
 if __name__ == "__main__":
     from sqlalchemy import create_engine, text
